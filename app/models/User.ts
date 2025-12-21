@@ -8,6 +8,7 @@ export interface IUser extends Document {
 	otpExpires?: Date;
 	isVerified: boolean;
 	avatar?: string;
+	plotMathLabIds: mongoose.Types.ObjectId[];
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -46,6 +47,10 @@ const UserSchema = new Schema(
 		isVerified: {
 			type: Boolean,
 			default: false,
+		},
+		plotMathLabIds: {
+			type: [{type: Schema.Types.ObjectId, ref: "PlotMathLab"}],
+			default: [],
 		},
 	},
 	{

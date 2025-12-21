@@ -25,6 +25,13 @@ export default function ForgotPasswordPage() {
 	const [countdown, setCountdown] = useState(60);
 
 	useEffect(() => {
+		const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+		if (loggedIn) {
+			nav.push("/home");
+		}
+	}, [nav]);
+
+	useEffect(() => {
 		let timer: NodeJS.Timeout;
 		if (step === 2 && countdown > 0) {
 			timer = setInterval(() => {

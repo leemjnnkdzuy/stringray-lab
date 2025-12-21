@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useEffect} from "react";
+import {useAuthContext} from "@/app/context/AuthContext";
 
 interface UserInfo {
 	id: string;
@@ -9,35 +9,37 @@ interface UserInfo {
 	avatar?: string;
 }
 
-export function useAuth() {
-	const [user, setUser] = useState<UserInfo | null>(null);
-	const [loading, setLoading] = useState(true);
+export function useAuth({enabled = true}: {enabled?: boolean} = {}): {
+	user: UserInfo | null;
+	loading: boolean;
+	isAuthenticated: boolean;
+	login: (
+		email: string,
+		password: string,
+		rememberMe?: boolean
+	) => Promise<{success: boolean; message?: string}>;
+	logout: () => Promise<void>;
+	refreshUser: () => Promise<void>;
+} {
+	const context = useAuthContext();
 
-	useEffect(() => {
-		const fetchUser = async () => {
-			try {
-				const res = await fetch("/api/auth/me", {
-					headers: {
-						"Cache-Control": "no-cache, no-store, must-revalidate",
-						Pragma: "no-cache",
-						Expires: "0",
-					},
-				});
-				if (res.ok) {
-					const data = await res.json();
-					setUser(data.user);
-				} else {
-					setUser(null);
-				}
-			} catch {
-				setUser(null);
-			} finally {
-				setLoading(false);
-			}
+	if (!enabled) {
+		return {
+			user: null,
+			loading: false,
+			isAuthenticated: false,
+			login: context.login,
+			logout: context.logout,
+			refreshUser: context.refreshUser,
 		};
+	}
 
-		fetchUser();
-	}, []);
-
-	return {user, loading};
+	return {
+		user: context.user,
+		loading: context.loading,
+		isAuthenticated: context.isAuthenticated,
+		login: context.login,
+		logout: context.logout,
+		refreshUser: context.refreshUser,
+	};
 }

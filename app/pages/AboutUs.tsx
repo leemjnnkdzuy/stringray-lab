@@ -3,7 +3,6 @@
 import {useRouter} from "next/navigation";
 import Image from "next/image";
 import {images} from "@/app/assets";
-import {Button} from "@/app/components/ui/Button";
 import {ArrowLeft, Facebook, Github, Instagram} from "lucide-react";
 
 const TikTokIcon = ({className}: {className?: string}) => (
@@ -56,13 +55,13 @@ export default function AboutUs() {
 			<div className='absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[128px] pointer-events-none -z-10' />
 
 			<div className='max-w-6xl mx-auto w-full'>
-				<Button
+				<button
 					onClick={() => nav.push("/")}
-					className='bg-transparent border-white/10 hover:bg-white/5 text-white/50 hover:text-white px-6 py-3 min-w-[auto]'
+					className='cursor-pointer p-2 rounded-full text-white/50 hover:text-white transition-colors flex items-center gap-2 group mb-8'
 				>
-					<ArrowLeft className='w-4 h-4 mr-2' />
-					Trở về trang chủ
-				</Button>
+					<ArrowLeft className='w-5 h-5 group-hover:-translate-x-1 transition-transform' />
+					<span className='font-medium'>Trở về trang chủ</span>
+				</button>
 
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-16 items-center'>
 					<div className='space-y-8'>

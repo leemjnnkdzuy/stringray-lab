@@ -1,47 +1,22 @@
 "use client";
 
-import {useState, useEffect} from "react";
+import {useState} from "react";
 import {useRouter} from "next/navigation";
 import {Button} from "@/app/components/ui/Button";
 import {LogOut, User, Mail, Loader2} from "lucide-react";
 import {motion} from "framer-motion";
-
-interface UserInfo {
-	id: string;
-	username: string;
-	email: string;
-	avatar?: string;
-}
+import {useAuthContext} from "@/app/context/AuthContext";
 
 export default function HomePage() {
 	const nav = useRouter();
-	const [user, setUser] = useState<UserInfo | null>(null);
-	const [loading, setLoading] = useState(true);
+	const {user, loading, logout} = useAuthContext();
 	const [loggingOut, setLoggingOut] = useState(false);
-
-	useEffect(() => {
-		const fetchUser = async () => {
-			try {
-				const res = await fetch("/api/auth/me");
-				if (res.ok) {
-					const data = await res.json();
-					setUser(data.user);
-				} else {
-					nav.push("/sign-in");
-				}
-			} catch {
-				nav.push("/sign-in");
-			} finally {
-				setLoading(false);
-			}
-		};
-		fetchUser();
-	}, [nav]);
 
 	const handleLogout = async () => {
 		setLoggingOut(true);
 		try {
-			await fetch("/api/auth/logout", {method: "POST"});
+			await logout();
+			localStorage.removeItem("isLoggedIn");
 			nav.push("/sign-in");
 		} catch {
 			setLoggingOut(false);
@@ -57,7 +32,7 @@ export default function HomePage() {
 	}
 
 	return (
-		<div className='min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center p-4'>
+		<div className='min-h-[calc(100vh-65px)] bg-black text-white relative overflow-hidden flex items-center justify-center p-4'>
 			<div className='absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black via-[#0d1117] to-black -z-20' />
 			<div className='absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#ff79c6]/10 rounded-full blur-[128px] pointer-events-none -z-10' />
 			<div className='absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[128px] pointer-events-none -z-10' />

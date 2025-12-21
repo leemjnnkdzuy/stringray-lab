@@ -1,17 +1,19 @@
 import {notFound} from "next/navigation";
 
-// Layout
 import FooterLayout from "@/app/components/layout/FooterLayout";
 import NothingLayout from "@/app/components/layout/NothingLayout";
+import {HeaderLayout} from "@/app/components/layout/HeaderLayout";
+import EditorLayout from "@/app/components/layout/EditorLayout";
 
-import {PrivateRoute, PublicRoute} from "@/app/components/auth/RouteGuard";
+import {PrivateRoute, PublicRoute} from "@/app/components/common/RouteGuard";
 
-// Pages
 import AboutUs from "@/app/pages/AboutUs";
 import SignInPage from "@/app/pages/SignInPage";
 import SignUpPage from "@/app/pages/SignUpPage";
 import ForgotPasswordPage from "@/app/pages/ForgotPasswordPage";
 import HomePage from "@/app/pages/HomePage";
+import CreatePlotPage from "@/app/pages/CreatePlotPage";
+import PlotMathLabEditorPage from "@/app/pages/PlotMathLabEditorPage";
 
 interface RouteConfig {
 	path: string;
@@ -44,7 +46,19 @@ const routes: RouteConfig[] = [
 	{
 		path: "/home",
 		component: HomePage,
-		layout: NothingLayout,
+		layout: HeaderLayout,
+		isPrivate: true,
+	},
+	{
+		path: "/create-plot",
+		component: CreatePlotPage,
+		layout: HeaderLayout,
+		isPrivate: true,
+	},
+	{
+		path: "/plot-editor",
+		component: PlotMathLabEditorPage,
+		layout: EditorLayout,
 		isPrivate: true,
 	},
 ];

@@ -5,12 +5,15 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const ACCESS_TOKEN_EXPIRY = "15m";
-const REFRESH_TOKEN_EXPIRY = "7d";
+const REFRESH_TOKEN_EXPIRY_DEFAULT = "7d";
+const REFRESH_TOKEN_EXPIRY_REMEMBER = "30d";
+const REFRESH_COOKIE_MAX_AGE_DEFAULT = 7 * 24 * 60 * 60;
+const REFRESH_COOKIE_MAX_AGE_REMEMBER = 30 * 24 * 60 * 60;
 
 export async function POST(req: Request) {
 	try {
 		await connectDatabase();
-		const {email, password} = await req.json();
+		const {email, password, rememberMe = false} = await req.json();
 
 		if (!email || !password) {
 			return NextResponse.json(
@@ -52,8 +55,12 @@ export async function POST(req: Request) {
 			{expiresIn: ACCESS_TOKEN_EXPIRY} as jwt.SignOptions
 		);
 
+		const refreshTokenExpiry = rememberMe
+			? REFRESH_TOKEN_EXPIRY_REMEMBER
+			: REFRESH_TOKEN_EXPIRY_DEFAULT;
+
 		const refreshToken = jwt.sign({userId: user._id}, refreshSecret, {
-			expiresIn: REFRESH_TOKEN_EXPIRY,
+			expiresIn: refreshTokenExpiry,
 		} as jwt.SignOptions);
 
 		const response = NextResponse.json(
@@ -81,7 +88,9 @@ export async function POST(req: Request) {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "strict",
-			maxAge: 7 * 24 * 60 * 60,
+			maxAge: rememberMe
+				? REFRESH_COOKIE_MAX_AGE_REMEMBER
+				: REFRESH_COOKIE_MAX_AGE_DEFAULT,
 			path: "/",
 		});
 

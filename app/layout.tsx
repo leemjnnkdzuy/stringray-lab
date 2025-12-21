@@ -18,6 +18,8 @@ export const metadata: Metadata = {
 };
 
 import {GlobalNotificationProvider} from "./context/GlobalNotificationContext";
+import {ThemeProvider} from "./hooks/useTheme";
+import {AuthProvider} from "./context/AuthContext";
 
 export default function RootLayout({
 	children,
@@ -29,9 +31,13 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<GlobalNotificationProvider>
-					{children}
-				</GlobalNotificationProvider>
+				<ThemeProvider>
+					<AuthProvider>
+						<GlobalNotificationProvider>
+							{children}
+						</GlobalNotificationProvider>
+					</AuthProvider>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

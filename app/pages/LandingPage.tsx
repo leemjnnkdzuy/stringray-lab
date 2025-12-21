@@ -7,6 +7,9 @@ import {Button} from "@/app/components/ui/Button";
 import {Card} from "@/app/components/ui/Card";
 import {useAuth} from "@/app/hooks/useAuth";
 import {useRouter} from "next/navigation";
+import {useTheme} from "@/app/hooks/useTheme";
+import {images} from "@/app/assets";
+import Image from "next/image";
 
 const matlabCode = `figure('Position',[300,50,900,900], 'Color','k');
 axes(gcf, 'NextPlot','add', 'Position',[0,0,1,1], 'Color','k');
@@ -38,8 +41,16 @@ while true
 end`;
 
 export default function LandingPage() {
-	const {user} = useAuth();
+	const [shouldFetch, setShouldFetch] = useState(false);
+
+	useEffect(() => {
+		const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+		if (loggedIn) setShouldFetch(true);
+	}, []);
+
+	const {user} = useAuth({enabled: shouldFetch});
 	const router = useRouter();
+	const {theme} = useTheme();
 	const [scrollProgress, setScrollProgress] = useState(0);
 	const [cardsVisible, setCardsVisible] = useState(false);
 	const [ctaVisible, setCtaVisible] = useState(false);
@@ -128,12 +139,16 @@ export default function LandingPage() {
 
 	return (
 		<div className='relative'>
-			<div className='fixed top-6 left-8 z-50 flex items-center gap-2 group cursor-pointer'>
-				<div className='w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 flex items-center justify-center transition-all group-hover:bg-white/20 group-hover:scale-110 group-hover:rotate-12'>
-					<Activity className='w-6 h-6 text-white' />
-				</div>
-				<span className='text-white font-bold text-xl tracking-wider drop-shadow-md transition-all group-hover:text-[#50fa7b]'>
-					STINGRAY<span className='text-[#ff79c6]'>LAB</span>
+			<div className='fixed top-6 left-8 z-50 flex items-center gap-3 group cursor-pointer'>
+				<Image
+					src={theme === "dark" ? images.logoWhite : images.logoBlack}
+					alt='Stingray Logo'
+					width={40}
+					height={40}
+					className='w-10 h-10 object-contain transition-all group-hover:scale-110'
+				/>
+				<span className='text-lg font-semibold text-white tracking-tight'>
+					Stingray Lab
 				</span>
 			</div>
 
@@ -236,8 +251,8 @@ export default function LandingPage() {
 					>
 						<div className='w-[50vw] h-full flex items-center justify-center'>
 							<div className='w-full max-w-2xl px-6'>
-								<div className='rounded-lg overflow-hidden border border-[#44475a] bg-[#282a36] shadow-2xl'>
-									<div className='px-4 py-3 flex items-center gap-2 border-b border-[#44475a] bg-[#282a36]'>
+								<div className='rounded-lg overflow-hidden border border-[#44475a] bg-[#252525] shadow-2xl'>
+									<div className='px-4 py-3 flex items-center gap-2 border-b border-[#44475a] bg-[#252525]'>
 										<div className='flex gap-2'>
 											<div className='w-3 h-3 rounded-full bg-[#ff5555]' />
 											<div className='w-3 h-3 rounded-full bg-[#f1fa8c]' />
@@ -247,7 +262,7 @@ export default function LandingPage() {
 											spiral_animation.m
 										</span>
 									</div>
-									<pre className='p-4 overflow-auto text-xs font-mono leading-relaxed max-h-[70vh] bg-[#282a36]'>
+									<pre className='p-4 overflow-auto text-xs font-mono leading-relaxed max-h-[70vh] bg-[#252525]'>
 										<code>
 											{matlabCode
 												.split("\n")
@@ -274,6 +289,7 @@ export default function LandingPage() {
 					</div>
 				</section>
 			</div>
+
 			{/* Purpose Section */}
 			<section className='min-h-screen bg-black py-24 px-8 relative overflow-hidden flex items-center'>
 				<div className='absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black via-[#0d1117] to-black -z-20' />

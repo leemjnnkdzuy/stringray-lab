@@ -1,22 +1,33 @@
 "use client";
-import {Activity, Heart} from "lucide-react";
+import {Heart} from "lucide-react";
 import {useRouter} from "next/navigation";
+import {useTheme} from "@/app/hooks/useTheme";
+import {images} from "@/app/assets";
+import Image from "next/image";
 
 export default function Footer() {
 	const nav = useRouter();
+	const {theme} = useTheme();
 
 	return (
 		<footer className='bg-[#080808] border-t border-white/10 py-12 px-8'>
 			<div className='max-w-6xl mx-auto'>
 				<div className='grid grid-cols-1 md:grid-cols-4 gap-8 mb-8'>
 					<div className='md:col-span-2'>
-						<div className='flex items-center gap-2 mb-4'>
-							<div className='w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center'>
-								<Activity className='w-5 h-5 text-white' />
-							</div>
-							<span className='text-white font-bold text-lg'>
-								STINGRAY
-								<span className='text-[#ff79c6]'>LAB</span>
+						<div className='flex items-center gap-3 mb-4 group cursor-pointer'>
+							<Image
+								src={
+									theme === "dark"
+										? images.logoWhite
+										: images.logoBlack
+								}
+								alt='Stingray Logo'
+								width={32}
+								height={32}
+								className='w-8 h-8 object-contain transition-all group-hover:scale-110'
+							/>
+							<span className='text-lg font-semibold text-white tracking-tight'>
+								Stingray Lab
 							</span>
 						</div>
 						<p className='text-white/50 text-sm max-w-xs'>

@@ -1,39 +1,19 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {useRouter} from "next/navigation";
 import {Loader2} from "lucide-react";
-
-interface UserInfo {
-	id: string;
-	username: string;
-	email: string;
-	avatar?: string;
-}
+import {useAuthContext} from "@/app/context/AuthContext";
 
 export function PrivateRoute({children}: {children: React.ReactNode}) {
 	const router = useRouter();
-	const [loading, setLoading] = useState(true);
-	const [user, setUser] = useState<UserInfo | null>(null);
+	const {user, loading} = useAuthContext();
 
 	useEffect(() => {
-		const checkAuth = async () => {
-			try {
-				const res = await fetch("/api/auth/me");
-				if (res.ok) {
-					const data = await res.json();
-					setUser(data.user);
-				} else {
-					router.push("/");
-				}
-			} catch {
-				router.push("/");
-			} finally {
-				setLoading(false);
-			}
-		};
-		checkAuth();
-	}, [router]);
+		if (!loading && !user) {
+			router.push("/");
+		}
+	}, [loading, user, router]);
 
 	if (loading) {
 		return (

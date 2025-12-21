@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {useState, useEffect, FormEvent} from "react";
 import {useRouter} from "next/navigation";
 import {Button} from "@/app/components/ui/Button";
 import {TextInput} from "@/app/components/ui/TextInput";
@@ -24,16 +24,26 @@ export default function SignInPage() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
+	const [rememberMe, setRememberMe] = useState(false);
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
 
-	const handleLogin = async () => {
+	useEffect(() => {
+		const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+		if (loggedIn) {
+			nav.push("/home");
+		}
+	}, [nav]);
+
+	const handleLogin = async (e: FormEvent) => {
+		e.preventDefault();
 		setError("");
 		setLoading(true);
 
 		try {
-			const res = await authService.login({email, password});
+			const res = await authService.login({email, password, rememberMe});
 			if (res.user) {
+				localStorage.setItem("isLoggedIn", "true");
 				nav.push("/home");
 			} else {
 				const errorMsg = res.message || "Đăng nhập thất bại";
@@ -100,20 +110,13 @@ export default function SignInPage() {
 					</h2>
 				</motion.div>
 
-				<motion.div
+				<motion.form
 					variants={containerVariants}
 					initial='hidden'
 					animate='visible'
 					className='space-y-6'
+					onSubmit={handleLogin}
 				>
-					{error && (
-						<motion.div
-							variants={itemVariants}
-							className='p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center'
-						>
-							{error}
-						</motion.div>
-					)}
 					<div className='space-y-4'>
 						<motion.div variants={itemVariants}>
 							<TextInput
@@ -160,13 +163,18 @@ export default function SignInPage() {
 						<label className='flex items-center gap-2 cursor-pointer group'>
 							<input
 								type='checkbox'
-								className='w-4 h-4 rounded border-white/20 bg-white/5checked:bg-[#ff79c6] checked:border-[#ff79c6] focus:ring-offset-0 focus:ring-[#ff79c6] transition-all cursor-pointer'
+								checked={rememberMe}
+								onChange={(e) =>
+									setRememberMe(e.target.checked)
+								}
+								className='w-4 h-4 rounded border-white/20 bg-white/5 checked:bg-[#ff79c6] checked:border-[#ff79c6] focus:ring-offset-0 focus:ring-[#ff79c6] transition-all cursor-pointer'
 							/>
 							<span className='text-white/60 group-hover:text-white/80 transition-colors'>
 								Ghi nhớ đăng nhập
 							</span>
 						</label>
 						<button
+							type='button'
 							onClick={() => nav.push("/forgot-password")}
 							className='cursor-pointer text-[#ff79c6] hover:text-[#ff92d0] transition-colors'
 						>
@@ -176,8 +184,8 @@ export default function SignInPage() {
 
 					<motion.div variants={itemVariants}>
 						<Button
+							type='submit'
 							className='w-full bg-transparent border-white/10 hover:bg-white/5 text-white/50 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed'
-							onClick={handleLogin}
 							disabled={loading}
 						>
 							{loading ? (
@@ -192,6 +200,7 @@ export default function SignInPage() {
 						<p className='text-center text-sm text-white/40'>
 							Chưa có tài khoản?{" "}
 							<button
+								type='button'
 								onClick={() => nav.push("/sign-up")}
 								className='cursor-pointer text-[#ff79c6] hover:text-[#ff92d0] transition-colors font-medium'
 							>
@@ -199,7 +208,7 @@ export default function SignInPage() {
 							</button>
 						</p>
 					</motion.div>
-				</motion.div>
+				</motion.form>
 			</div>
 		</div>
 	);

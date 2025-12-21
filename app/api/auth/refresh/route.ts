@@ -1,6 +1,13 @@
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import jwt from "jsonwebtoken";
+import connectDatabase from "@/app/utils/ConnectDB";
+import User from "@/app/models/User";
+
+const ACCESS_TOKEN_EXPIRY = "15m";
+const REFRESH_TOKEN_EXPIRY = "7d";
+const ACCESS_COOKIE_MAX_AGE = 15 * 60;
+const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60;
 
 export async function POST() {
 	try {
@@ -22,20 +29,54 @@ export async function POST() {
 			userId: string;
 		};
 
-		const accessToken = jwt.sign({userId: decoded.userId}, jwtSecret, {
-			expiresIn: "15m",
+		await connectDatabase();
+		const user = await User.findById(decoded.userId).select(
+			"-password -otp -otpExpires"
+		);
+
+		if (!user) {
+			return NextResponse.json(
+				{message: "Người dùng không tồn tại"},
+				{status: 404}
+			);
+		}
+
+		const newAccessToken = jwt.sign(
+			{userId: user._id, email: user.email, username: user.username},
+			jwtSecret,
+			{expiresIn: ACCESS_TOKEN_EXPIRY} as jwt.SignOptions
+		);
+
+		const newRefreshToken = jwt.sign({userId: user._id}, refreshSecret, {
+			expiresIn: REFRESH_TOKEN_EXPIRY,
 		} as jwt.SignOptions);
 
 		const response = NextResponse.json(
-			{message: "Token đã được làm mới"},
+			{
+				message: "Token đã được làm mới",
+				user: {
+					id: user._id,
+					username: user.username,
+					email: user.email,
+					avatar: user.avatar,
+				},
+			},
 			{status: 200}
 		);
 
-		response.cookies.set("accessToken", accessToken, {
+		response.cookies.set("accessToken", newAccessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "strict",
-			maxAge: 15 * 60,
+			maxAge: ACCESS_COOKIE_MAX_AGE,
+			path: "/",
+		});
+
+		response.cookies.set("refreshToken", newRefreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "strict",
+			maxAge: REFRESH_COOKIE_MAX_AGE,
 			path: "/",
 		});
 
