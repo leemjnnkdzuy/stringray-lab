@@ -8,13 +8,13 @@ import {plotService, PlotInfo} from "@/app/services/plotService";
 import {Loader2} from "lucide-react";
 import NotFoundPage from "@/app/pages/NotFoundPage";
 
-interface PlotMathLabEditorPageProps {
+interface PlotJavascriptEditorPageProps {
 	plotId?: string;
 }
 
-export default function PlotMathLabEditorPage({
+export default function PlotJavascriptEditorPage({
 	plotId,
-}: PlotMathLabEditorPageProps) {
+}: PlotJavascriptEditorPageProps) {
 	const router = useRouter();
 	const [leftWidth, setLeftWidth] = useState(50);
 	const [isDragging, setIsDragging] = useState(false);
@@ -36,7 +36,7 @@ export default function PlotMathLabEditorPage({
 		if (!plotId) return;
 		setLoading(true);
 		try {
-			const result = await plotService.getPlot("matlab", plotId);
+			const result = await plotService.getPlot("js", plotId);
 			if (result.plot) {
 				setPlot(result.plot);
 				setSourceCode(result.plot.sourceCode || "");
@@ -70,7 +70,7 @@ export default function PlotMathLabEditorPage({
 	if (loading) {
 		return (
 			<div className='flex-1 flex items-center justify-center bg-[#0f0f1a]'>
-				<Loader2 className='w-8 h-8 text-[#ff79c6] animate-spin' />
+				<Loader2 className='w-8 h-8 text-[#f1fa8c] animate-spin' />
 			</div>
 		);
 	}
@@ -84,7 +84,8 @@ export default function PlotMathLabEditorPage({
 
 		try {
 			setPlot((prev) => (prev ? {...prev, ...data} : null));
-			await plotService.updatePlot("matlab", plot.id, data);
+
+			await plotService.updatePlot("js", plot.id, data);
 		} catch (error) {
 			console.error("Update plot error:", error);
 		}
@@ -93,7 +94,7 @@ export default function PlotMathLabEditorPage({
 	const handleDeleteProject = async () => {
 		if (!plot) return;
 		try {
-			await plotService.deletePlot("matlab", plot.id);
+			await plotService.deletePlot("js", plot.id);
 			router.push("/home");
 		} catch (error) {
 			console.error("Delete plot error:", error);
@@ -105,7 +106,7 @@ export default function PlotMathLabEditorPage({
 			<EditorHeader
 				plotName={plot?.name || "Untitled Plot"}
 				plotDescription={plot?.description}
-				plotType='matlab'
+				plotType='js'
 				onSave={() => console.log("Save")}
 				onRun={() => console.log("Run")}
 				isPublic={plot?.isPublic}
@@ -127,11 +128,11 @@ export default function PlotMathLabEditorPage({
 				>
 					<div className='p-4'>
 						<div className='text-white/40 text-sm mb-2 font-mono'>
-							% Code Editor
+							// Code Editor
 						</div>
 						<textarea
 							className='w-full h-[calc(100vh-150px)] bg-transparent text-white font-mono text-sm resize-none focus:outline-none'
-							placeholder='% Viết code MATLAB của bạn ở đây...'
+							placeholder='// Viết code của bạn ở đây...'
 							spellCheck={false}
 							value={sourceCode}
 							onChange={(e) => setSourceCode(e.target.value)}
@@ -141,8 +142,8 @@ export default function PlotMathLabEditorPage({
 
 				<div
 					onMouseDown={handleMouseDown}
-					className={`w-1 cursor-col-resize hover:bg-[#ff79c6]/50 transition-colors ${
-						isDragging ? "bg-[#ff79c6]" : "bg-transparent"
+					className={`w-1 cursor-col-resize hover:bg-[#f1fa8c]/50 transition-colors ${
+						isDragging ? "bg-[#f1fa8c]" : "bg-transparent"
 					}`}
 				/>
 

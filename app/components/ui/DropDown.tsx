@@ -19,6 +19,66 @@ interface DropDownProps {
 	className?: string;
 }
 
+interface DropDownContentProps {
+	trigger: React.ReactNode;
+	children: React.ReactNode;
+	isOpen: boolean;
+	onOpenChange: (open: boolean) => void;
+	align?: "left" | "right";
+	className?: string;
+}
+
+export const DropDownContent = ({
+	trigger,
+	children,
+	isOpen,
+	onOpenChange,
+	align = "left",
+	className,
+}: DropDownContentProps) => {
+	const dropdownRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				dropdownRef.current &&
+				!dropdownRef.current.contains(event.target as Node)
+			) {
+				onOpenChange(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [onOpenChange]);
+
+	return (
+		<div className='relative' ref={dropdownRef}>
+			<div onClick={() => onOpenChange(!isOpen)}>{trigger}</div>
+
+			<AnimatePresence>
+				{isOpen && (
+					<motion.div
+						initial={{opacity: 0, y: 10, scale: 0.95}}
+						animate={{opacity: 1, y: 0, scale: 1}}
+						exit={{opacity: 0, y: 10, scale: 0.95}}
+						transition={{duration: 0.1}}
+						className={cn(
+							"absolute top-full mt-2 rounded-xl border border-white/10 bg-[#0a0a0a]/95 backdrop-blur-xl shadow-xl z-50 overflow-hidden",
+							align === "right" ? "right-0" : "left-0",
+							className
+						)}
+					>
+						{children}
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</div>
+	);
+};
+
 export const DropDown = ({
 	trigger,
 	items,

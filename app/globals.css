@@ -46,6 +46,10 @@
 	--radius-4xl: calc(var(--radius) + 16px);
 }
 
+* {
+	user-select: none;
+}
+
 :root {
 	--radius: 0.625rem;
 	--background: oklch(1 0 0);
@@ -122,4 +126,40 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 4px;
+	transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 121, 198, 0.5);
+}
+
+::-webkit-scrollbar-thumb:active {
+	background: rgba(255, 121, 198, 0.7);
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+* {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+*:hover {
+	scrollbar-color: rgba(255, 121, 198, 0.5) transparent;
 }

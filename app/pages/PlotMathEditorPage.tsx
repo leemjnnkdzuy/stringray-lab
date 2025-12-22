@@ -8,20 +8,18 @@ import {plotService, PlotInfo} from "@/app/services/plotService";
 import {Loader2} from "lucide-react";
 import NotFoundPage from "@/app/pages/NotFoundPage";
 
-interface PlotMathLabEditorPageProps {
+interface PlotMathEditorPageProps {
 	plotId?: string;
 }
 
-export default function PlotMathLabEditorPage({
-	plotId,
-}: PlotMathLabEditorPageProps) {
+export default function PlotMathEditorPage({plotId}: PlotMathEditorPageProps) {
 	const router = useRouter();
 	const [leftWidth, setLeftWidth] = useState(50);
 	const [isDragging, setIsDragging] = useState(false);
 	const [plot, setPlot] = useState<PlotInfo | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [notFound, setNotFound] = useState(false);
-	const [sourceCode, setSourceCode] = useState("");
+	const [expression, setExpression] = useState("");
 
 	useEffect(() => {
 		if (plotId) {
@@ -36,10 +34,10 @@ export default function PlotMathLabEditorPage({
 		if (!plotId) return;
 		setLoading(true);
 		try {
-			const result = await plotService.getPlot("matlab", plotId);
+			const result = await plotService.getPlot("math", plotId);
 			if (result.plot) {
 				setPlot(result.plot);
-				setSourceCode(result.plot.sourceCode || "");
+				setExpression(result.plot.expression || "");
 			} else {
 				setNotFound(true);
 			}
@@ -70,7 +68,7 @@ export default function PlotMathLabEditorPage({
 	if (loading) {
 		return (
 			<div className='flex-1 flex items-center justify-center bg-[#0f0f1a]'>
-				<Loader2 className='w-8 h-8 text-[#ff79c6] animate-spin' />
+				<Loader2 className='w-8 h-8 text-[#8be9fd] animate-spin' />
 			</div>
 		);
 	}
@@ -84,7 +82,7 @@ export default function PlotMathLabEditorPage({
 
 		try {
 			setPlot((prev) => (prev ? {...prev, ...data} : null));
-			await plotService.updatePlot("matlab", plot.id, data);
+			await plotService.updatePlot("math", plot.id, data);
 		} catch (error) {
 			console.error("Update plot error:", error);
 		}
@@ -93,7 +91,7 @@ export default function PlotMathLabEditorPage({
 	const handleDeleteProject = async () => {
 		if (!plot) return;
 		try {
-			await plotService.deletePlot("matlab", plot.id);
+			await plotService.deletePlot("math", plot.id);
 			router.push("/home");
 		} catch (error) {
 			console.error("Delete plot error:", error);
@@ -105,7 +103,7 @@ export default function PlotMathLabEditorPage({
 			<EditorHeader
 				plotName={plot?.name || "Untitled Plot"}
 				plotDescription={plot?.description}
-				plotType='matlab'
+				plotType='math'
 				onSave={() => console.log("Save")}
 				onRun={() => console.log("Run")}
 				isPublic={plot?.isPublic}
@@ -127,22 +125,22 @@ export default function PlotMathLabEditorPage({
 				>
 					<div className='p-4'>
 						<div className='text-white/40 text-sm mb-2 font-mono'>
-							% Code Editor
+							// Biểu thức toán học
 						</div>
 						<textarea
 							className='w-full h-[calc(100vh-150px)] bg-transparent text-white font-mono text-sm resize-none focus:outline-none'
-							placeholder='% Viết code MATLAB của bạn ở đây...'
+							placeholder='Nhập biểu thức toán học của bạn ở đây...'
 							spellCheck={false}
-							value={sourceCode}
-							onChange={(e) => setSourceCode(e.target.value)}
+							value={expression}
+							onChange={(e) => setExpression(e.target.value)}
 						/>
 					</div>
 				</div>
 
 				<div
 					onMouseDown={handleMouseDown}
-					className={`w-1 cursor-col-resize hover:bg-[#ff79c6]/50 transition-colors ${
-						isDragging ? "bg-[#ff79c6]" : "bg-transparent"
+					className={`w-1 cursor-col-resize hover:bg-[#8be9fd]/50 transition-colors ${
+						isDragging ? "bg-[#8be9fd]" : "bg-transparent"
 					}`}
 				/>
 

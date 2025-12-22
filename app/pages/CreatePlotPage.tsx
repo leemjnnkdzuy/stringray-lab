@@ -15,13 +15,13 @@ import {
 	Edit3,
 	Globe,
 	Lock,
+	Loader2,
 } from "lucide-react";
 import {Button} from "@/app/components/ui/Button";
 import {TextInput} from "@/app/components/ui/TextInput";
 import {Toggle} from "@/app/components/ui/Toggle";
 import {cn} from "@/app/utils/utils";
-
-type PlotType = "js" | "matlab" | "math";
+import {plotService, PlotType} from "@/app/services/plotService";
 
 interface PlotTypeOption {
 	id: PlotType;
@@ -68,22 +68,43 @@ export default function CreatePlotPage() {
 	const [isPublic, setIsPublic] = useState(true);
 	const [allowViewSource, setAllowViewSource] = useState(false);
 	const [allowEdit, setAllowEdit] = useState(false);
+	const [isCreating, setIsCreating] = useState(false);
 
 	const handleSelectType = (type: PlotType) => {
 		setPlotType(type);
 		setPhase(2);
 	};
 
-	const handleCreate = () => {
-		console.log("Creating plot:", {
-			type: plotType,
-			name,
-			description,
-			isPublic,
-			allowViewSource,
-			allowEdit,
-		});
-		router.push("/plot-editor");
+	const getEditorUrl = (type: PlotType, plotId: string): string => {
+		const routes: Record<PlotType, string> = {
+			js: `/plot/javascript/${plotId}/edit`,
+			matlab: `/plot/matlab/${plotId}/edit`,
+			math: `/plot/math/${plotId}/edit`,
+		};
+		return routes[type];
+	};
+
+	const handleCreate = async () => {
+		if (!plotType || !name.trim() || isCreating) return;
+
+		setIsCreating(true);
+		try {
+			const result = await plotService.createPlot(plotType, {
+				name,
+				description,
+				isPublic,
+				allowViewSource,
+				allowEdit,
+			});
+
+			if (result.plotId) {
+				router.push(getEditorUrl(plotType, result.plotId));
+			}
+		} catch (error) {
+			console.error("Create plot error:", error);
+		} finally {
+			setIsCreating(false);
+		}
 	};
 
 	const containerVariants = {
@@ -155,12 +176,12 @@ export default function CreatePlotPage() {
 										onClick={() =>
 											handleSelectType(type.id)
 										}
-										className='group relative p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer overflow-hidden'
+										className='group relative p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer overflow-hidden'
 									>
 										<div
-											className='absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500'
+											className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 scale-0 group-hover:scale-100 origin-top-left'
 											style={{
-												backgroundColor: type.color,
+												background: `radial-gradient(circle at 15% 15%, ${type.color}25 0%, ${type.color}15 30%, ${type.color}05 60%, transparent 80%)`,
 											}}
 										/>
 

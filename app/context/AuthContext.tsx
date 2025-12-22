@@ -10,12 +10,43 @@ import {
 } from "react";
 import api from "@/app/utils/axios";
 
+interface SocialLinks {
+	facebook?: string;
+	twitter?: string;
+	github?: string;
+	linkedin?: string;
+	instagram?: string;
+	website?: string;
+}
+
+interface VisibilitySettings {
+	bio?: boolean;
+	birthday?: boolean;
+	location?: boolean;
+	workplace?: boolean;
+	socialLinks?: {
+		facebook?: boolean;
+		twitter?: boolean;
+		github?: boolean;
+		linkedin?: boolean;
+		instagram?: boolean;
+		website?: boolean;
+	};
+}
+
 interface User {
 	id: string;
 	username: string;
 	email: string;
 	avatar?: string;
+	birthday?: string;
+	location?: string;
+	workplace?: string;
+	bio?: string;
+	socialLinks?: SocialLinks;
+	visibilitySettings?: VisibilitySettings;
 	isVerified?: boolean;
+	createdAt?: string;
 }
 
 interface AuthContextType {

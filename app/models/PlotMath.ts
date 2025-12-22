@@ -1,22 +1,19 @@
 import mongoose, {Schema, Document, Model} from "mongoose";
 
-export type PlotType = "js" | "matlab" | "math";
-
-export interface IPlotMathLab extends Document {
+export interface IPlotMath extends Document {
 	userId: mongoose.Types.ObjectId;
 	name: string;
 	description?: string;
-	type: PlotType;
 	isPublic: boolean;
 	isPinned: boolean;
 	allowViewSource: boolean;
 	allowEdit: boolean;
-	sourceCode: string;
+	expression: string;
 	createdAt: Date;
 	updatedAt: Date;
 }
 
-const PlotMathLabSchema = new Schema(
+const PlotMathSchema = new Schema(
 	{
 		userId: {
 			type: Schema.Types.ObjectId,
@@ -50,7 +47,7 @@ const PlotMathLabSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
-		sourceCode: {
+		expression: {
 			type: String,
 			default: "",
 		},
@@ -60,8 +57,8 @@ const PlotMathLabSchema = new Schema(
 	}
 );
 
-const PlotMathLab: Model<IPlotMathLab> =
-	mongoose.models.PlotMathLab ||
-	mongoose.model<IPlotMathLab>("PlotMathLab", PlotMathLabSchema);
+const PlotMath: Model<IPlotMath> =
+	mongoose.models.PlotMath ||
+	mongoose.model<IPlotMath>("PlotMath", PlotMathSchema);
 
-export default PlotMathLab;
+export default PlotMath;
