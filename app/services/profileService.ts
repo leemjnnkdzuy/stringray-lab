@@ -28,6 +28,7 @@ export interface SocialLinks {
 
 export interface UpdateProfileData {
 	avatar?: string;
+	cover?: string;
 	birthday?: string | null;
 	location?: string | null;
 	workplace?: string | null;
@@ -43,6 +44,7 @@ export interface UpdateProfileResponse {
 		username: string;
 		email: string;
 		avatar?: string;
+		cover?: string;
 		birthday?: string;
 		location?: string;
 		workplace?: string;

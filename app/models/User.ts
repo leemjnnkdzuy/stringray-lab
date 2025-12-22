@@ -32,6 +32,7 @@ export interface IUser extends Document {
 	otpExpires?: Date;
 	isVerified: boolean;
 	avatar?: string;
+	cover?: string;
 	birthday?: Date;
 	location?: string;
 	workplace?: string;
@@ -92,6 +93,10 @@ const UserSchema = new Schema(
 			required: false,
 		},
 		avatar: {
+			type: String,
+			default: null,
+		},
+		cover: {
 			type: String,
 			default: null,
 		},

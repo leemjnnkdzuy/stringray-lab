@@ -39,6 +39,7 @@ interface User {
 	username: string;
 	email: string;
 	avatar?: string;
+	cover?: string;
 	birthday?: string;
 	location?: string;
 	workplace?: string;

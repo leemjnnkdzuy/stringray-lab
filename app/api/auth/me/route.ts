@@ -42,6 +42,7 @@ export async function GET() {
 					username: user.username,
 					email: user.email,
 					avatar: user.avatar,
+					cover: user.cover,
 					birthday: user.birthday,
 					location: user.location,
 					workplace: user.workplace,

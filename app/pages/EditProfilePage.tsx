@@ -25,6 +25,7 @@ import {Button} from "@/app/components/ui/Button";
 import {DateInput} from "@/app/components/ui/DateInput";
 import {Toggle} from "@/app/components/ui/Toggle";
 import {AvatarUploadOverlay} from "@/app/components/common/AvatarUploadOverlay";
+import {CoverUploadOverlay} from "@/app/components/common/CoverUploadOverlay";
 import {profileService} from "@/app/services/profileService";
 
 interface SocialLinksVisibility {
@@ -78,7 +79,9 @@ export default function EditProfilePage() {
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
 	const [avatarOverlayOpen, setAvatarOverlayOpen] = useState(false);
+	const [coverOverlayOpen, setCoverOverlayOpen] = useState(false);
 	const [avatar, setAvatar] = useState<string | undefined>(undefined);
+	const [cover, setCover] = useState<string | undefined>(undefined);
 
 	useEffect(() => {
 		if (user) {
@@ -114,6 +117,7 @@ export default function EditProfilePage() {
 				});
 			}
 			setAvatar(user.avatar);
+			setCover(user.cover);
 		}
 	}, [user]);
 
@@ -128,6 +132,7 @@ export default function EditProfilePage() {
 			);
 			const response = await profileService.updateProfile({
 				avatar: avatar,
+				cover: cover,
 				birthday: birthday || null,
 				location: location || null,
 				workplace: workplace || null,
@@ -199,9 +204,20 @@ export default function EditProfilePage() {
 		<>
 			<div className='min-h-[calc(100vh-65px)] bg-black text-white pb-20'>
 				<div className='relative h-[300px] md:h-[400px] w-full'>
-					<div className='absolute inset-0 bg-gradient-to-br from-[#ff79c6]/30 via-[#bd93f9]/20 to-[#8be9fd]/30' />
+					{cover ? (
+						<img
+							src={cover}
+							alt='Cover'
+							className='absolute inset-0 w-full h-full object-cover'
+						/>
+					) : (
+						<div className='absolute inset-0 bg-gradient-to-br from-[#ff79c6]/30 via-[#bd93f9]/20 to-[#8be9fd]/30' />
+					)}
 					<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent' />
-					<button className='absolute bottom-4 right-4 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 text-white text-sm font-medium flex items-center gap-2 transition-all cursor-pointer'>
+					<button
+						onClick={() => setCoverOverlayOpen(true)}
+						className='absolute bottom-4 right-4 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 text-white text-sm font-medium flex items-center gap-2 transition-all cursor-pointer'
+					>
 						<Camera className='w-4 h-4' />
 						<span className='hidden sm:inline'>
 							Chỉnh sửa ảnh bìa
@@ -604,6 +620,13 @@ export default function EditProfilePage() {
 				onClose={() => setAvatarOverlayOpen(false)}
 				onUpload={handleAvatarUpload}
 				currentAvatar={avatar}
+			/>
+
+			<CoverUploadOverlay
+				isOpen={coverOverlayOpen}
+				onClose={() => setCoverOverlayOpen(false)}
+				onUpload={(base64) => setCover(base64)}
+				currentCover={cover}
 			/>
 		</>
 	);

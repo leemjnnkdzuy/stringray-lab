@@ -62,6 +62,10 @@ export async function PATCH(req: Request) {
 			updateData.avatar = data.avatar;
 		}
 
+		if (data.cover !== undefined) {
+			updateData.cover = data.cover;
+		}
+
 		if (data.birthday !== undefined) {
 			updateData.birthday = data.birthday
 				? new Date(data.birthday)
@@ -121,6 +125,7 @@ export async function PATCH(req: Request) {
 					username: updatedUser.username,
 					email: updatedUser.email,
 					avatar: updatedUser.avatar,
+					cover: updatedUser.cover,
 					birthday: updatedUser.birthday,
 					location: updatedUser.location,
 					workplace: updatedUser.workplace,

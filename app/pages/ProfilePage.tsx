@@ -443,7 +443,15 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 	return (
 		<div className='min-h-[calc(100vh-65px)] bg-black text-white'>
 			<div className='relative h-[300px] md:h-[400px] w-full'>
-				<div className='absolute inset-0 bg-gradient-to-br from-[#ff79c6]/30 via-[#bd93f9]/20 to-[#8be9fd]/30' />
+				{user?.cover ? (
+					<img
+						src={user.cover}
+						alt='Cover'
+						className='absolute inset-0 w-full h-full object-cover'
+					/>
+				) : (
+					<div className='absolute inset-0 bg-gradient-to-br from-[#ff79c6]/30 via-[#bd93f9]/20 to-[#8be9fd]/30' />
+				)}
 				<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent' />
 			</div>
 
