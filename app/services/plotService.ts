@@ -8,6 +8,7 @@ export interface CreatePlotData {
 	isPublic: boolean;
 	allowViewSource: boolean;
 	allowEdit: boolean;
+	sourceCode?: string;
 }
 
 export interface CreatePlotResponse {

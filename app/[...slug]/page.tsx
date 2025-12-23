@@ -21,7 +21,7 @@ import EditProfilePage from "@/app/pages/EditProfilePage";
 
 interface RouteConfig {
 	path: string;
-	component: React.ComponentType<{plotId?: string}>;
+	component: React.ComponentType<{plotId?: string; identifier?: string}>;
 	layout: React.ComponentType<{children: React.ReactNode}>;
 	isPrivate?: boolean;
 	isDynamic?: boolean;
@@ -65,6 +65,12 @@ const routes: RouteConfig[] = [
 		component: EditProfilePage,
 		layout: HeaderLayout,
 		isPrivate: true,
+	},
+	{
+		path: "/profile/:identifier",
+		component: ProfilePage,
+		layout: HeaderLayout,
+		isDynamic: true,
 	},
 	{
 		path: "/create-plot",
@@ -156,7 +162,10 @@ export default async function DynamicPage({params}: PageProps) {
 	return (
 		<Layout>
 			<Guard>
-				<Component plotId={routeParams.id} />
+				<Component
+					plotId={routeParams.id}
+					identifier={routeParams.identifier}
+				/>
 			</Guard>
 		</Layout>
 	);

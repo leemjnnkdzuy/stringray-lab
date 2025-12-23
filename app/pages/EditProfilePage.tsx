@@ -253,15 +253,7 @@ export default function EditProfilePage() {
 							</button>
 						</div>
 
-						<div className='flex-1 pb-4'>
-							<h1 className='text-2xl md:text-3xl font-bold text-white'>
-								Chỉnh sửa Profile
-							</h1>
-							<p className='text-white/50 text-sm mt-1'>
-								Cập nhật thông tin cá nhân của bạn
-							</p>
-						</div>
-
+						<div className='flex-1' />
 						<div className='flex gap-2 pb-4'>
 							<Button
 								onClick={handleCancel}

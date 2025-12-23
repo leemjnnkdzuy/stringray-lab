@@ -47,6 +47,35 @@ interface ProfileData {
 		id: string;
 		username: string;
 		avatar?: string;
+		cover?: string;
+		bio?: string;
+		location?: string;
+		workplace?: string;
+		birthday?: string;
+		email?: string;
+		socialLinks?: {
+			facebook?: string;
+			twitter?: string;
+			github?: string;
+			linkedin?: string;
+			instagram?: string;
+			website?: string;
+		};
+		visibilitySettings?: {
+			bio?: boolean;
+			birthday?: boolean;
+			location?: boolean;
+			workplace?: boolean;
+			socialLinks?: {
+				facebook?: boolean;
+				twitter?: boolean;
+				github?: boolean;
+				linkedin?: boolean;
+				instagram?: boolean;
+				website?: boolean;
+			};
+		};
+		createdAt?: string;
 	};
 	isOwnProfile: boolean;
 }
@@ -70,9 +99,10 @@ const typeColors: Record<string, string> = {
 
 interface ProfilePageProps {
 	plotId?: string;
+	identifier?: string;
 }
 
-export default function ProfilePage({plotId}: ProfilePageProps) {
+export default function ProfilePage({plotId, identifier}: ProfilePageProps) {
 	const router = useRouter();
 	const {user, loading: authLoading} = useAuthContext();
 	const [activeTab, setActiveTab] = useState<TabType>("overview");
@@ -82,7 +112,7 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 	const [loading, setLoading] = useState(true);
 	const [pinningPlotId, setPinningPlotId] = useState<string | null>(null);
 
-	const targetUserId = plotId || user?.id;
+	const targetUserId = identifier || plotId || user?.id;
 
 	useEffect(() => {
 		const fetchPlots = async () => {
@@ -158,7 +188,7 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 				<h4 className='text-white font-medium group-hover:text-[#ff79c6] transition-colors'>
 					{plot.name}
 				</h4>
-				{plot.isPublic && (
+				{isOwnProfile && plot.isPublic && (
 					<button
 						onClick={(e) => {
 							e.stopPropagation();
@@ -190,11 +220,12 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 				</p>
 			)}
 			<div className='flex items-center gap-2'>
-				{plot.isPublic ? (
-					<Globe className='w-3.5 h-3.5 text-green-400' />
-				) : (
-					<Lock className='w-3.5 h-3.5 text-white/40' />
-				)}
+				{isOwnProfile &&
+					(plot.isPublic ? (
+						<Globe className='w-3.5 h-3.5 text-green-400' />
+					) : (
+						<Lock className='w-3.5 h-3.5 text-white/40' />
+					))}
 				<span
 					className={`text-xs px-2 py-0.5 rounded-full ${
 						typeColors[plot.type]
@@ -216,39 +247,45 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 					initial={{opacity: 0, y: 20}}
 					animate={{opacity: 1, y: 0}}
 				>
-					{user?.bio && user.visibilitySettings?.bio !== false && (
-						<p className='text-white/70 text-sm mb-4'>{user.bio}</p>
-					)}
+					{displayUser?.bio &&
+						displayUser.visibilitySettings?.bio !== false && (
+							<p className='text-white/70 text-sm mb-4'>
+								{displayUser.bio}
+							</p>
+						)}
 					<h3 className='text-lg font-semibold text-white mb-4'>
 						Giới thiệu
 					</h3>
 					<div className='space-y-3'>
-						{user?.workplace &&
-							user.visibilitySettings?.workplace !== false && (
+						{displayUser?.workplace &&
+							displayUser.visibilitySettings?.workplace !==
+								false && (
 								<div className='flex items-center gap-3 text-white/70'>
 									<Briefcase className='w-5 h-5 text-white/40' />
 									<span className='text-sm'>
-										Làm việc tại {user.workplace}
+										Làm việc tại {displayUser.workplace}
 									</span>
 								</div>
 							)}
-						{user?.location &&
-							user.visibilitySettings?.location !== false && (
+						{displayUser?.location &&
+							displayUser.visibilitySettings?.location !==
+								false && (
 								<div className='flex items-center gap-3 text-white/70'>
 									<MapPin className='w-5 h-5 text-white/40' />
 									<span className='text-sm'>
-										Đến từ {user.location}
+										Đến từ {displayUser.location}
 									</span>
 								</div>
 							)}
-						{user?.birthday &&
-							user.visibilitySettings?.birthday !== false && (
+						{displayUser?.birthday &&
+							displayUser.visibilitySettings?.birthday !==
+								false && (
 								<div className='flex items-center gap-3 text-white/70'>
 									<Cake className='w-5 h-5 text-white/40' />
 									<span className='text-sm'>
 										Sinh ngày{" "}
 										{new Date(
-											user.birthday
+											displayUser.birthday
 										).toLocaleDateString("vi-VN", {
 											day: "numeric",
 											month: "long",
@@ -257,19 +294,21 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 									</span>
 								</div>
 							)}
-						{isOwnProfile && user?.email && (
+						{isOwnProfile && displayUser?.email && (
 							<div className='flex items-center gap-3 text-white/70'>
 								<Mail className='w-5 h-5 text-white/40' />
-								<span className='text-sm'>{user.email}</span>
+								<span className='text-sm'>
+									{displayUser.email}
+								</span>
 							</div>
 						)}
 						<div className='flex items-center gap-3 text-white/70'>
 							<Calendar className='w-5 h-5 text-white/40' />
 							<span className='text-sm'>
 								Tham gia{" "}
-								{user?.createdAt
+								{displayUser?.createdAt
 									? new Date(
-											user.createdAt
+											displayUser.createdAt
 									  ).toLocaleDateString("vi-VN", {
 											month: "long",
 											year: "numeric",
@@ -277,17 +316,20 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 									: ""}
 							</span>
 						</div>
-						{user?.socialLinks &&
-							Object.values(user.socialLinks).some((v) => v) && (
+						{displayUser?.socialLinks &&
+							Object.values(displayUser.socialLinks).some(
+								(v) => v
+							) && (
 								<div className='pt-3'>
 									<div className='flex items-center gap-2 flex-wrap'>
-										{user.socialLinks.facebook &&
-											user.visibilitySettings?.socialLinks
-												?.facebook !== false && (
+										{displayUser.socialLinks.facebook &&
+											displayUser.visibilitySettings
+												?.socialLinks?.facebook !==
+												false && (
 												<div
 													onClick={() =>
 														window.open(
-															user.socialLinks!
+															displayUser.socialLinks!
 																.facebook,
 															"_blank"
 														)
@@ -297,13 +339,14 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 													<Facebook className='w-4 h-4 text-white/60' />
 												</div>
 											)}
-										{user.socialLinks.twitter &&
-											user.visibilitySettings?.socialLinks
-												?.twitter !== false && (
+										{displayUser.socialLinks.twitter &&
+											displayUser.visibilitySettings
+												?.socialLinks?.twitter !==
+												false && (
 												<div
 													onClick={() =>
 														window.open(
-															user.socialLinks!
+															displayUser.socialLinks!
 																.twitter,
 															"_blank"
 														)
@@ -313,13 +356,14 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 													<Twitter className='w-4 h-4 text-white/60' />
 												</div>
 											)}
-										{user.socialLinks.github &&
-											user.visibilitySettings?.socialLinks
-												?.github !== false && (
+										{displayUser.socialLinks.github &&
+											displayUser.visibilitySettings
+												?.socialLinks?.github !==
+												false && (
 												<div
 													onClick={() =>
 														window.open(
-															user.socialLinks!
+															displayUser.socialLinks!
 																.github,
 															"_blank"
 														)
@@ -329,13 +373,14 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 													<Github className='w-4 h-4 text-white/60' />
 												</div>
 											)}
-										{user.socialLinks.linkedin &&
-											user.visibilitySettings?.socialLinks
-												?.linkedin !== false && (
+										{displayUser.socialLinks.linkedin &&
+											displayUser.visibilitySettings
+												?.socialLinks?.linkedin !==
+												false && (
 												<div
 													onClick={() =>
 														window.open(
-															user.socialLinks!
+															displayUser.socialLinks!
 																.linkedin,
 															"_blank"
 														)
@@ -345,13 +390,14 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 													<Linkedin className='w-4 h-4 text-white/60' />
 												</div>
 											)}
-										{user.socialLinks.instagram &&
-											user.visibilitySettings?.socialLinks
-												?.instagram !== false && (
+										{displayUser.socialLinks.instagram &&
+											displayUser.visibilitySettings
+												?.socialLinks?.instagram !==
+												false && (
 												<div
 													onClick={() =>
 														window.open(
-															user.socialLinks!
+															displayUser.socialLinks!
 																.instagram,
 															"_blank"
 														)
@@ -361,13 +407,14 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 													<Instagram className='w-4 h-4 text-white/60' />
 												</div>
 											)}
-										{user.socialLinks.website &&
-											user.visibilitySettings?.socialLinks
-												?.website !== false && (
+										{displayUser.socialLinks.website &&
+											displayUser.visibilitySettings
+												?.socialLinks?.website !==
+												false && (
 												<div
 													onClick={() =>
 														window.open(
-															user.socialLinks!
+															displayUser.socialLinks!
 																.website,
 															"_blank"
 														)
@@ -443,9 +490,9 @@ export default function ProfilePage({plotId}: ProfilePageProps) {
 	return (
 		<div className='min-h-[calc(100vh-65px)] bg-black text-white'>
 			<div className='relative h-[300px] md:h-[400px] w-full'>
-				{user?.cover ? (
+				{displayUser?.cover ? (
 					<img
-						src={user.cover}
+						src={displayUser.cover}
 						alt='Cover'
 						className='absolute inset-0 w-full h-full object-cover'
 					/>

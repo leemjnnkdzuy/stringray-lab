@@ -7,9 +7,11 @@ interface HeaderLayoutProps {
 
 export const HeaderLayout = ({children}: HeaderLayoutProps) => {
 	return (
-		<div className='min-h-screen bg-[#000000] text-white selection:bg-[#ff79c6]/30'>
+		<div className='h-screen bg-[#000000] text-white selection:bg-[#ff79c6]/30 flex flex-col overflow-hidden'>
 			<HomeHeader />
-			<main className='relative z-0'>{children}</main>
+			<main className='relative z-0 flex-1 overflow-y-auto'>
+				{children}
+			</main>
 		</div>
 	);
 };

@@ -13,19 +13,25 @@ const REFRESH_COOKIE_MAX_AGE_REMEMBER = 30 * 24 * 60 * 60;
 export async function POST(req: Request) {
 	try {
 		await connectDatabase();
-		const {email, password, rememberMe = false} = await req.json();
+		const {
+			email: identifier,
+			password,
+			rememberMe = false,
+		} = await req.json();
 
-		if (!email || !password) {
+		if (!identifier || !password) {
 			return NextResponse.json(
-				{message: "Vui lòng nhập email và mật khẩu"},
+				{message: "Vui lòng nhập email/username và mật khẩu"},
 				{status: 400}
 			);
 		}
 
-		const user = await User.findOne({email});
+		const user = await User.findOne({
+			$or: [{email: identifier}, {username: identifier}],
+		});
 		if (!user || !user.password) {
 			return NextResponse.json(
-				{message: "Email hoặc mật khẩu không chính xác"},
+				{message: "Thông tin đăng nhập không chính xác"},
 				{status: 401}
 			);
 		}
@@ -40,7 +46,7 @@ export async function POST(req: Request) {
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 		if (!isPasswordValid) {
 			return NextResponse.json(
-				{message: "Email hoặc mật khẩu không chính xác"},
+				{message: "Thông tin đăng nhập không chính xác"},
 				{status: 401}
 			);
 		}

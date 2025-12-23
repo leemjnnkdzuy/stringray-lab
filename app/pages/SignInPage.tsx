@@ -10,7 +10,7 @@ import {
 	Eye,
 	EyeOff,
 	Lock,
-	Mail,
+	User,
 	Loader2,
 } from "lucide-react";
 import {authService} from "@/app/services/auth";
@@ -120,12 +120,12 @@ export default function SignInPage() {
 					<div className='space-y-4'>
 						<motion.div variants={itemVariants}>
 							<TextInput
-								label='Email'
-								icon={Mail}
-								type='email'
+								label='Email hoặc Username'
+								icon={User}
+								type='text'
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
-								placeholder='name@example.com'
+								placeholder='username'
 							/>
 						</motion.div>
 

@@ -1,6 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import connectDatabase from "@/app/utils/ConnectDB";
 import PlotJavascript from "@/app/models/PlotJavascript";
 import PlotMathLab from "@/app/models/PlotMathLab";
@@ -12,19 +13,25 @@ export async function GET(
 	{params}: {params: Promise<{id: string}>}
 ) {
 	try {
-		const {id: targetUserId} = await params;
+		const {id: identifier} = await params;
 		const {searchParams} = new URL(request.url);
 		const pinnedOnly = searchParams.get("pinned") === "true";
 
 		await connectDatabase();
 
-		const targetUser = await User.findById(targetUserId);
+		const isValidObjectId = mongoose.Types.ObjectId.isValid(identifier);
+		const targetUser = isValidObjectId
+			? await User.findById(identifier)
+			: await User.findOne({username: identifier});
+
 		if (!targetUser) {
 			return NextResponse.json(
 				{message: "Không tìm thấy người dùng"},
 				{status: 404}
 			);
 		}
+
+		const targetUserId = targetUser._id.toString();
 
 		const cookieStore = await cookies();
 		const accessToken = cookieStore.get("accessToken")?.value;
@@ -109,6 +116,14 @@ export async function GET(
 					id: targetUser._id.toString(),
 					username: targetUser.username,
 					avatar: targetUser.avatar,
+					cover: targetUser.cover,
+					bio: targetUser.bio,
+					location: targetUser.location,
+					workplace: targetUser.workplace,
+					birthday: targetUser.birthday,
+					socialLinks: targetUser.socialLinks,
+					visibilitySettings: targetUser.visibilitySettings,
+					createdAt: targetUser.createdAt,
 				},
 				isOwnProfile,
 			},

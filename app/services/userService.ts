@@ -14,6 +14,34 @@ export interface UserInfo {
 	id: string;
 	username: string;
 	avatar?: string;
+	cover?: string;
+	bio?: string;
+	location?: string;
+	workplace?: string;
+	birthday?: string;
+	socialLinks?: {
+		facebook?: string;
+		twitter?: string;
+		github?: string;
+		linkedin?: string;
+		instagram?: string;
+		website?: string;
+	};
+	visibilitySettings?: {
+		bio?: boolean;
+		birthday?: boolean;
+		location?: boolean;
+		workplace?: boolean;
+		socialLinks?: {
+			facebook?: boolean;
+			twitter?: boolean;
+			github?: boolean;
+			linkedin?: boolean;
+			instagram?: boolean;
+			website?: boolean;
+		};
+	};
+	createdAt?: string;
 }
 
 export interface GetUserPlotsResponse {
